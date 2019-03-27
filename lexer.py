@@ -46,6 +46,8 @@ class Lexer:
             return self.recognize_bracket(character)
         if is_punctuation(character):
             return self.recognize_punctuation(character)
+        if is_string(character):
+            return self.recognize_string()
 
     def recognize_identifier(self):
         identifier = ''
@@ -56,7 +58,11 @@ class Lexer:
             identifier += character
             self.position += 1
             self.column += 1
-        return Token(TokenTypes.identifier, identifier, self.line, self.column)
+        if is_reserved_identifier(identifier):
+            type_i = get_reserved_identifier_by_value(identifier)
+            return Token(type_i, identifier, self.line, self.column)
+        else:
+            return Token(TokenTypes.identifier, identifier, self.line, self.column)
 
     def recognize_number(self):
         number = ''
@@ -70,7 +76,11 @@ class Lexer:
         return Token(TokenTypes.number, number, self.line, self.column)
 
     def recognize_string(self):
-        print(1)
+        r = re.match(r'".*"', self.input[self.position:])
+        self.position += r.end()
+        self.column += r.end()
+        string = r.group()
+        return Token(TokenTypes.string, string, self.line, self.column)
 
     def recognize_operator(self):
         character = self.input[self.position]

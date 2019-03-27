@@ -6,3 +6,4 @@ if (a > b) {
 } else {
     max = b;
 }
+string s = "Abrakadabra"

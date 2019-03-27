@@ -3,6 +3,7 @@ from enum import Enum
 
 class TokenTypes(Enum):
     identifier = 'identifier'
+    reserved_identifier = 'reserved_idn'
     number = 'number'
     eof = 'eof'
     plus = '+'
