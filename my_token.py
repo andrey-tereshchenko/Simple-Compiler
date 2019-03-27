@@ -11,7 +11,7 @@ class TokenTypes(Enum):
     div = '/'
     and_operator = 'and'
     or_operator = 'or'
-    not_operator = 'not'
+    not_operator = '!'
     equal = '=='
     eq_oper = '='
     not_equal = '!='
@@ -47,3 +47,5 @@ class Token:
         self.value = value
         self.line = line
         self.column = column
+
+

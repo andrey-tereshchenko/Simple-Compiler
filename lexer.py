@@ -1,5 +1,5 @@
-from token import TokenTypes, Token
 from character_util import *
+from my_token import Token
 
 
 class Lexer:
@@ -11,12 +11,12 @@ class Lexer:
 
     def skip_whitespace_and_new_lines(self):
         while self.position < len(self.input) and self.input[self.position] in (' ', '\n'):
-            self.position += 1
             if self.input[self.position] == '\n':
                 self.line += 1
                 self.column = 0
             else:
                 self.column += 1
+            self.position += 1
 
     def all_tokens(self):
         tokens = list()
@@ -40,7 +40,7 @@ class Lexer:
             return self.recognize_operator()
         if is_number(character):
             return self.recognize_number()
-        if is_parenthesis():
+        if is_parenthesis(character):
             return self.recognize_parenthesis(character)
         if is_bracket(character):
             return self.recognize_bracket(character)
@@ -59,13 +59,75 @@ class Lexer:
         return Token(TokenTypes.identifier, identifier, self.line, self.column)
 
     def recognize_number(self):
-        print(1)
+        number = ''
+        while self.position < len(self.input):
+            character = self.input[self.position]
+            if not (is_number(character)):
+                break
+            number += character
+            self.position += 1
+            self.column += 1
+        return Token(TokenTypes.number, number, self.line, self.column)
 
     def recognize_string(self):
         print(1)
 
     def recognize_operator(self):
-        print(1)
+        character = self.input[self.position]
+        if is_compare_operator(character):
+            return self.recognize_compare_operator()
+        if is_arithmetic_operator(character):
+            return self.recognize_arithmetic_operator()
+
+    def recognize_compare_operator(self):
+        character = self.input[self.position]
+        lookahead_index = self.position + 1
+        if lookahead_index < len(self.input):
+            lookahead = self.input[lookahead_index]
+        else:
+            lookahead = None
+        is_lookahead_equal_symbol = lookahead == '='
+        if is_lookahead_equal_symbol:
+            self.position += 1
+            self.column += 1
+
+        self.position += 1
+        self.column += 1
+        if character == '>':
+            if is_lookahead_equal_symbol:
+                return Token(TokenTypes.rt_equal, '>=', self.line, self.column)
+            else:
+                return Token(TokenTypes.rt, '>', self.line, self.column)
+        elif character == '<':
+            if is_lookahead_equal_symbol:
+                return Token(TokenTypes.lt_equal, '<=', self.line, self.column)
+            else:
+                return Token(TokenTypes.lt, '<', self.line, self.column)
+        elif character == '=':
+            if is_lookahead_equal_symbol:
+                return Token(TokenTypes.equal, '==', self.line, self.column)
+            else:
+                return Token(TokenTypes.eq_oper, '=', self.line, self.column)
+        elif character == '!':
+            if is_lookahead_equal_symbol:
+                return Token(TokenTypes.not_equal, '!=', self.line, self.column)
+            else:
+                return Token(TokenTypes.not_operator, '!', self.line, self.column)
+
+    def recognize_arithmetic_operator(self):
+        character = self.input[self.position]
+        self.position += 1
+        self.column += 1
+        if character == '+':
+            return Token(TokenTypes.plus, character, self.line, self.column)
+        elif character == '-':
+            return Token(TokenTypes.minus, character, self.line, self.column)
+        elif character == '*':
+            return Token(TokenTypes.times, character, self.line, self.column)
+        elif character == '/':
+            return Token(TokenTypes.div, character, self.line, self.column)
+        elif character == '.':
+            return Token(TokenTypes.dot, character, self.line, self.column)
 
     def recognize_parenthesis(self, char):
         self.position += 1

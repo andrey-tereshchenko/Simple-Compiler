@@ -1,14 +1,26 @@
-from token import TokenTypes
+from my_token import TokenTypes
 
-arithmetic_operators = [TokenTypes.plus, TokenTypes.minus, TokenTypes.div, TokenTypes.times]
+arithmetic_operators = [TokenTypes.plus.value, TokenTypes.minus.value, TokenTypes.div.value, TokenTypes.times.value,
+                        TokenTypes.dot.value]
 
-compare_operators = [TokenTypes.lt, TokenTypes.rt, TokenTypes.rt_equal, TokenTypes.lt_equal, TokenTypes.not_equal,
-                     TokenTypes.eq_oper]
-reserved_identifier = [TokenTypes.integer, TokenTypes.string, TokenTypes.if_i, TokenTypes.else_i, TokenTypes.while_i,
-                       TokenTypes.return_i, TokenTypes.film, TokenTypes.genre, TokenTypes.actor, TokenTypes.user,
-                       TokenTypes.for_i]
+compare_operators = [TokenTypes.lt.value, TokenTypes.rt.value, TokenTypes.rt_equal.value, TokenTypes.lt_equal.value,
+                     TokenTypes.not_equal.value,
+                     TokenTypes.eq_oper.value]
+logic_operator = [TokenTypes.and_operator.value, TokenTypes.not_operator.value, TokenTypes.or_operator.value]
+reserved_identifier = [TokenTypes.integer.value, TokenTypes.string.value, TokenTypes.if_i.value,
+                       TokenTypes.else_i.value, TokenTypes.while_i.value,
+                       TokenTypes.return_i.value, TokenTypes.film.value, TokenTypes.genre.value, TokenTypes.actor.value,
+                       TokenTypes.user.value, TokenTypes.for_i.value]
 punctuation_chars = ';,'
 operators = list()
+
+
+def is_compare_operator(char):
+    return char in compare_operators
+
+
+def is_arithmetic_operator(char):
+    return char in arithmetic_operators
 
 
 def is_reserved_identifier(identifier):
