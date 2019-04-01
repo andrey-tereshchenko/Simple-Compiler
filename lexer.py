@@ -6,7 +6,7 @@ class Lexer:
     def __init__(self, input):
         self.input = input
         self.position = 0
-        self.line = 0
+        self.line = 1
         self.column = 0
 
     def skip_whitespace_and_new_lines(self):

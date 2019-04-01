@@ -1,9 +1,1 @@
-integer a = 54;
-integer b = 1;
-integer max;
-if (a > b) {
-    max = a;
-} else {
-    max = b;
-}
-string s = "Abrakadabra"
+integer c = ((5 + a)*b)*(3 + 10 / b);
