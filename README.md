@@ -43,6 +43,73 @@ is present, then Lexical analyzer will correlate that error with the source file
 The parser is a compiler component that breaks down data into smaller elements for easy translation into another language. The parser accepts 
 input data in the form of a sequence of tokens or program instructions and usually builds the data structure in the form
 of a parse tree or an abstract syntax tree.
+## Syntax diagrams
+### program
+### block
+### functions
+### declaration
+### statements
+### statement
+## Stack Machine
+In computer science, computer engineering and programming language implementations, a stack machine is a type of computer. In some cases, the term refers to a software scheme that simulates a stack machine. The main difference from other computers is that most of its instructions operate on a pushdown stack of numbers rather than numbers in registers. Most computer systems implement a stack in some form to pass parameters and link to subroutines. This does not make these computers stack machines.
+
+### Operations codes
+```
+    push = 1
+    pushi = 2
+    halt = 3
+    pop = 4
+    print_int = 5
+    print_char = 6
+    print_bool = 7
+    print_real = 8
+    newline = 9
+    logical_not = 10
+    add = 11
+    xchg = 12
+    cvr = 13
+    fadd = 14
+    sub = 15
+    fsub = 16
+    divide = 17
+    multiply = 18
+    fmultiply = 19
+    logical_or = 20
+    greater_than = 21
+    less_than = 22
+    equal = 23
+    not_equal = 24
+    gte = 25
+    lte = 26
+    jfalse = 27
+    jump = 28
+    put = 29
+    get = 30
+    array_print = 31
+```
+### Compress bytes to save operation in stack
+```
+def compress_bytes(initial):
+    shift_one = int(initial) >> 24
+    shift_two = int(initial) >> 16
+    shift_three = int(initial) >> 8
+    shift_four = int(initial) >> 0
+
+    f = 0xFF
+
+    return shift_one & f, shift_two & f, shift_three & f, shift_four & f
+```
+### Decompress bytes to execute operation from stack
+```
+def decompress_bytes(compressed_version):
+    shift_one = compressed_version[0] << 24
+    shift_two = compressed_version[1] << 16
+    shift_three = compressed_version[2] << 8
+    shift_four = compressed_version[3] << 0
+
+    return shift_one | shift_two | shift_three | shift_four
+```
+
 # Simulator
 
 # Examples
