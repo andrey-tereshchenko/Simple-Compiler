@@ -87,7 +87,7 @@ def help_caseQuote(lexer, tempString, current):
 def help_caseComment(lexer):
     # Parameters
 
-    if lexer.pascal_file[lexer.array_index] == "\n":
+    if lexer.input_file[lexer.array_index] == "\n":
         lexer.token.set_colNumber(lexer.token.get_colNumber() + 0)
         lexer.token.set_rowNumber(lexer.token.get_rowNumber() + 1)
     else:

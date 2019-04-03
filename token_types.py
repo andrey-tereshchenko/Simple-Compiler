@@ -1,4 +1,4 @@
-supported_operators = "+-/,()<>:=.;*[]"
+supported_operators = "+-/,()<>:!=.;*[]"
 
 defined_keywords_list = {
     "absolute": "TK_absolute",
@@ -75,16 +75,16 @@ operators_KeyValue_list = {
     ")": "RIGHT_PAR",
     "<": "LESS_THAN",
     ">": "GREATER_THAN",
-    ":=": "ASSIGNMENT",
+    "=": "ASSIGNMENT",
     ".": "DOT",
     ";": "SEMICOLON",
     ":": "COLON",
-    "=": "EQUAL",
+    "==": "EQUAL",
     "*": "MULTIPLY",
     "/": "DIVIDE",
-    "<>": "NOT_EQUAL",
-    "<=:": "LESS_THAN_EQUAL",
-    ">=:": "GREATER_THAN_EQUAL",
+    "!=": "NOT_EQUAL",
+    "<=": "LESS_THAN_EQUAL",
+    ">=": "GREATER_THAN_EQUAL",
     "[": "LEFT_BRACKET",
     "]": "RIGHT_BRACKET"
 }
