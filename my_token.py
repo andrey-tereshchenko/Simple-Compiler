@@ -1,52 +1,19 @@
-from enum import Enum
+class Token(object):
+    def __init__(self):
+        self.row_number = 1
+        self.col_number = 1
 
+    def get_rowNumber(self):
+        return self.row_number
 
-class TokenTypes(Enum):
-    identifier = 'identifier'
-    # reserved_identifier = 'reserved_idn'
-    number = 'number'
-    eof = 'eof'
-    plus = '+'
-    minus = '-'
-    times = '*'
-    div = '/'
-    and_operator = 'and'
-    or_operator = 'or'
-    not_operator = '!'
-    equal = '=='
-    eq_oper = '='
-    not_equal = '!='
-    lt = '<'
-    rt = '>'
-    lt_equal = '<='
-    rt_equal = '>='
-    dot = '.'
-    integer = 'integer'
-    string = 'string'
-    boolean = 'boolean'
-    user = 'user'
-    film = 'film'
-    actor = 'actor'
-    genre = 'genre'
-    if_i = 'if'
-    else_i = 'else'
-    while_i = 'while'
-    for_i = 'for'
-    return_i = 'return'
-    l_parent = '('
-    r_parent = ')'
-    comma = ','
-    semi = ';'
-    l_brace = '{'
-    r_brace = '}'
+    def set_rowNumber(self, num):
+        self.row_number = num
 
+    def set_colNumber(self, num):
+        self.col_number = num
 
-class Token:
+    def get_colNumber(self):
+        return self.col_number
 
-    def __init__(self, type, value, line, column):
-        self.type = type
-        self.value = value
-        self.line = line
-        self.column = column
-
-
+    def build_token(self, value, tok_type):
+        return value, tok_type, self.row_number, self.col_number

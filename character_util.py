@@ -1,71 +1,96 @@
-import re
+def help_caseLetter(lexer, temp_word):
+    lexer.token.set_colNumber(lexer.token.get_colNumber() + len(temp_word))
+    lexer.array_index += len(temp_word)
 
-from my_token import TokenTypes
-
-arithmetic_operators = [TokenTypes.plus.value, TokenTypes.minus.value, TokenTypes.div.value, TokenTypes.times.value,
-                        TokenTypes.dot.value]
-
-compare_operators = [TokenTypes.lt.value, TokenTypes.rt.value, TokenTypes.rt_equal.value, TokenTypes.lt_equal.value,
-                     TokenTypes.not_equal.value,
-                     TokenTypes.eq_oper.value]
-logic_operator = [TokenTypes.and_operator.value, TokenTypes.not_operator.value, TokenTypes.or_operator.value]
-reserved_identifier = [TokenTypes.integer, TokenTypes.string, TokenTypes.if_i,
-                       TokenTypes.else_i, TokenTypes.while_i,
-                       TokenTypes.return_i, TokenTypes.film, TokenTypes.genre, TokenTypes.actor,
-                       TokenTypes.user, TokenTypes.for_i]
-punctuation_chars = ';,'
-operators = list()
+    # check if the string is a reserved keyword
+    if temp_word in lexer.defined_keywords_list:
+        return lexer.token_builder(temp_word, temp_word)
+    # if not then it's a string literal
+    else:
+        return lexer.token_builder(temp_word, "id")
 
 
-def is_compare_operator(char):
-    return char in compare_operators
+def help_caseNum(lexer, digit):
+    if "." in digit:
+        temp_index = digit.find(".")
+
+        if digit.count('.') == 1:
+            real_number = float(digit)
+            return lexer.token_builder(real_number, "real")
+        elif digit.count('.') == 2:
+            return lexer.token_builder(digit, "range")
+        else:
+            return "Invalid number format"
+    # if not a real number or a range then it has to be an integer
+    else:
+        real_number = int(digit)
+        return lexer.token_builder(real_number, "integer")
 
 
-def is_arithmetic_operator(char):
-    return char in arithmetic_operators
+def help_caseOperator(lexer, tempOperator, nextOperator):
+    if nextOperator == "=":
+        tempOperator += nextOperator
+        lexer.array_index += 2
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 2)
+        return lexer.op_token_builder(tempOperator)
+    else:
+        lexer.array_index += 1
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
+        return lexer.op_token_builder(tempOperator)
 
 
-def is_reserved_identifier(identifier):
-    return identifier in [i.value for i in reserved_identifier]
+def check_lte_notequal(lexer, tempOperator, nextOperator):
+    if nextOperator == ">":
+        tempOperator += nextOperator
+        lexer.array_index += 2
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 2)
+        return lexer.op_token_builder(tempOperator)
+    elif nextOperator == "=":
+        tempOperator += nextOperator
+        lexer.array_index += 2
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 2)
+        return lexer.op_token_builder(tempOperator)
+    else:
+        lexer.array_index += 1
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
+        return lexer.op_token_builder(tempOperator)
 
 
-def get_reserved_identifier_by_value(value):
-    for idn in reserved_identifier:
-        if idn.value == value:
-            return idn
+def check_comment(lexer, tempOperator, nextChar):
+    if nextChar == "*":
+        return lexer.if_comment(tempOperator, nextChar)
+    else:
+        lexer.array_index += 1
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
+        return lexer.op_token_builder(tempOperator)
 
 
-def is_operator(char):
-    return char in arithmetic_operators or char in compare_operators
+def help_caseQuote(lexer, tempString, current):
+    # Check if it is the closing '
+    if current == "\'":
+        tempString += current
+        lexer.array_index += 1
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
+        return lexer.token_builder(tempString, "string")
+    # else it is just another char
+    else:
+        tempString += current
+        if current == "\n":
+            lexer.token.set_colNumber(0)
+            lexer.token.set_rowNumber(lexer.token.get_rowNumber() + 1)
+        else:
+            lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
+
+        lexer.array_index += 1
 
 
-def is_alpha_or_(char):
-    return char.isalpha() or char == '_'
+def help_caseComment(lexer):
+    # Parameters
 
+    if lexer.pascal_file[lexer.array_index] == "\n":
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 0)
+        lexer.token.set_rowNumber(lexer.token.get_rowNumber() + 1)
+    else:
+        lexer.token.set_colNumber(lexer.token.get_colNumber() + 1)
 
-def is_number(char):
-    return char.isdigit()
-
-
-def is_string(character):
-    return character == '"'
-
-
-def is_arithmetic_operator(char):
-    return char in arithmetic_operators
-
-
-def is_parenthesis(char):
-    return char == '(' or char == ')'
-
-
-def is_whitespace_or_newline(char):
-    return char == ' ' or char == '\n'
-
-
-def is_bracket(char):
-    return char == '{' or char == '}'
-
-
-def is_punctuation(char):
-    return char in punctuation_chars
+    lexer.array_index += 1

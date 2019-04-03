@@ -1,164 +1,151 @@
-from character_util import *
+import token_types
+import character_util as psh
 from my_token import Token
 
 
-class Lexer:
-    def __init__(self, input):
-        self.input = input
-        self.position = 0
-        self.line = 1
-        self.column = 0
+class Lexer(object):
+    # constructor
+    def __init__(self, file):
+        self.defined_keywords_list = token_types.defined_keywords_list
+        self.supported_operators = token_types.supported_operators
+        self.operators_KeyValue_list = token_types.operators_KeyValue_list
 
-    def skip_whitespace_and_new_lines(self):
-        while self.position < len(self.input) and self.input[self.position] in (' ', '\n'):
-            if self.input[self.position] == '\n':
-                self.line += 1
-                self.column = 0
+        self.array_index = 0
+        self.token = Token()
+        self.token_lst = []
+
+        # read in pascal_file file
+        with open(file, 'r') as pascal_testfile:
+            self.pascal_file = pascal_testfile.read().lower()
+
+    def token_builder(self, tempWord, keyValue):
+        return Token.build_token(self.token, tempWord, token_types.defined_keywords_list.get(keyValue).upper())
+
+    def op_token_builder(self, tempOperator):
+        return Token.build_token(self.token, tempOperator,
+                                 'TK_' + self.operators_KeyValue_list.get(tempOperator))
+
+    def scan(self):
+        while len(self.pascal_file) > self.array_index:
+
+            if self.pascal_file[self.array_index].isalpha():
+                self.token_lst.append(self.if_letter())
+            elif self.pascal_file[self.array_index].isdigit():
+                self.token_lst.append(self.if_number())
+            elif self.pascal_file[self.array_index] in self.supported_operators:
+                self.token_lst.append(self.if_operator())
+            elif self.pascal_file[self.array_index] == " ":
+                self.array_index += 1
+                self.token.set_colNumber(self.token.get_colNumber() + 1)
+            elif self.pascal_file[self.array_index] == "\n":
+                self.array_index += 1
+                self.token.set_rowNumber(self.token.get_rowNumber() + 1)
+                self.token.set_colNumber(0)
+            elif self.pascal_file[self.array_index] == "\'":
+                self.token_lst.append(self.if_quote())
             else:
-                self.column += 1
-            self.position += 1
+                raise TypeError("Can't identify char: " + self.pascal_file[self.array_index])
 
-    def all_tokens(self):
-        tokens = list()
-        current_token = self.next_token()
-        while current_token.type != TokenTypes.eof:
-            tokens.append(current_token)
-            current_token = self.next_token()
-        return tokens
+        eof = self.token.build_token("EOF", token_types.defined_keywords_list.get("eof").upper())
+        self.token_lst.append(eof)
 
-    def next_token(self):
-        if self.position >= len(self.input):
-            return Token(TokenTypes.eof, '', self.line, self.column)
+        return self.token_lst
 
-        self.skip_whitespace_and_new_lines()
+    def if_letter(self):
+        # Parameters
+        # Returns: A token which was returned by the helper function
 
-        character = self.input[self.position]
-
-        if is_alpha_or_(character):
-            return self.recognize_identifier()
-        if is_operator(character):
-            return self.recognize_operator()
-        if is_number(character):
-            return self.recognize_number()
-        if is_parenthesis(character):
-            return self.recognize_parenthesis(character)
-        if is_bracket(character):
-            return self.recognize_bracket(character)
-        if is_punctuation(character):
-            return self.recognize_punctuation(character)
-        if is_string(character):
-            return self.recognize_string()
-
-    def recognize_identifier(self):
-        identifier = ''
-        while self.position < len(self.input):
-            character = self.input[self.position]
-            if not (is_alpha_or_(character) or is_number(character)):
-                break
-            identifier += character
-            self.position += 1
-            self.column += 1
-        if is_reserved_identifier(identifier):
-            type_i = get_reserved_identifier_by_value(identifier)
-            return Token(type_i, identifier, self.line, self.column)
-        else:
-            return Token(TokenTypes.identifier, identifier, self.line, self.column)
-
-    def recognize_number(self):
-        number = ''
-        while self.position < len(self.input):
-            character = self.input[self.position]
-            if not (is_number(character)):
-                break
-            number += character
-            self.position += 1
-            self.column += 1
-        return Token(TokenTypes.number, number, self.line, self.column)
-
-    def recognize_string(self):
-        r = re.match(r'".*"', self.input[self.position:])
-        self.position += r.end()
-        self.column += r.end()
-        string = r.group()
-        return Token(TokenTypes.string, string, self.line, self.column)
-
-    def recognize_operator(self):
-        character = self.input[self.position]
-        if is_compare_operator(character):
-            return self.recognize_compare_operator()
-        if is_arithmetic_operator(character):
-            return self.recognize_arithmetic_operator()
-
-    def recognize_compare_operator(self):
-        character = self.input[self.position]
-        lookahead_index = self.position + 1
-        if lookahead_index < len(self.input):
-            lookahead = self.input[lookahead_index]
-        else:
-            lookahead = None
-        is_lookahead_equal_symbol = lookahead == '='
-        if is_lookahead_equal_symbol:
-            self.position += 1
-            self.column += 1
-
-        self.position += 1
-        self.column += 1
-        if character == '>':
-            if is_lookahead_equal_symbol:
-                return Token(TokenTypes.rt_equal, '>=', self.line, self.column)
+        word_infile = ""
+        # Loop through each character
+        for character in self.pascal_file[self.array_index:]:
+            # create string
+            if character.isalpha() or character.isdigit():
+                word_infile += character
             else:
-                return Token(TokenTypes.rt, '>', self.line, self.column)
-        elif character == '<':
-            if is_lookahead_equal_symbol:
-                return Token(TokenTypes.lt_equal, '<=', self.line, self.column)
+                return psh.help_caseLetter(self, word_infile)
+
+    def if_number(self):
+        # Parameters
+        # Returns: A token which was returned by the helper function
+
+        digit_infile = ""
+
+        while self.array_index < len(self.pascal_file):
+            # create string of numbers
+            if self.pascal_file[self.array_index].isdigit() or \
+                    self.pascal_file[self.array_index] == '.':
+                digit_infile += self.pascal_file[self.array_index]
+                self.array_index += 1
+                self.token.set_colNumber(self.token.get_colNumber() + 1)
             else:
-                return Token(TokenTypes.lt, '<', self.line, self.column)
-        elif character == '=':
-            if is_lookahead_equal_symbol:
-                return Token(TokenTypes.equal, '==', self.line, self.column)
+                return psh.help_caseNum(self, digit_infile)
+
+    def if_operator(self):
+        # Parameters
+        # Returns: A token which was returned by one of the helper functions
+
+        tempOperator = ""
+
+        while self.array_index < len(self.pascal_file):
+
+            tempOperator += self.pascal_file[self.array_index]
+
+            # check if single colon or assignment
+            if self.pascal_file[self.array_index] == ":":
+                return psh.help_caseOperator(self, tempOperator, self.pascal_file[self.array_index + 1])
+
+            # check if <, <=, or !=
+            elif self.pascal_file[self.array_index] == "<":
+                return psh.check_lte_notequal(self, tempOperator, self.pascal_file[self.array_index + 1])
+
+            # if greater than or gte
+            elif self.pascal_file[self.array_index] == ">":
+                return psh.help_caseOperator(self, tempOperator, self.pascal_file[self.array_index + 1])
+
+            # check if a comment
+            elif self.pascal_file[self.array_index] == "(":
+                return psh.check_comment(self, tempOperator, self.pascal_file[self.array_index + 1])
             else:
-                return Token(TokenTypes.eq_oper, '=', self.line, self.column)
-        elif character == '!':
-            if is_lookahead_equal_symbol:
-                return Token(TokenTypes.not_equal, '!=', self.line, self.column)
-            else:
-                return Token(TokenTypes.not_operator, '!', self.line, self.column)
+                self.array_index += 1
+                self.token.set_colNumber(self.token.get_colNumber() + 1)
 
-    def recognize_arithmetic_operator(self):
-        character = self.input[self.position]
-        self.position += 1
-        self.column += 1
-        if character == '+':
-            return Token(TokenTypes.plus, character, self.line, self.column)
-        elif character == '-':
-            return Token(TokenTypes.minus, character, self.line, self.column)
-        elif character == '*':
-            return Token(TokenTypes.times, character, self.line, self.column)
-        elif character == '/':
-            return Token(TokenTypes.div, character, self.line, self.column)
-        elif character == '.':
-            return Token(TokenTypes.dot, character, self.line, self.column)
+                return self.op_token_builder(tempOperator)
 
-    def recognize_parenthesis(self, char):
-        self.position += 1
-        self.column += 1
-        if char == '(':
-            return Token(TokenTypes.l_parent, char, self.line, self.column)
-        else:
-            return Token(TokenTypes.r_parent, char, self.line, self.column)
+    def if_comment(self, current, next):
+        # Parameters
+        # Returns: A comment token
 
-    def recognize_punctuation(self, char):
-        self.position += 1
-        self.column += 1
-        if char == ';':
-            return Token(TokenTypes.semi, char, self.line, self.column)
-        else:
-            return Token(TokenTypes.comma, char, self.line, self.column)
+        curr_comment = ""
+        curr_comment += current + next
+        self.array_index += 2
+        self.token.set_colNumber(self.token.get_colNumber() + 2)
 
-    def recognize_bracket(self, char):
-        self.position += 1
-        self.column += 1
-        if char == '{':
-            return Token(TokenTypes.l_brace, char, self.line, self.column)
-        else:
-            return Token(TokenTypes.r_brace, char, self.line, self.column)
+        while self.array_index < len(self.pascal_file) and \
+                self.pascal_file[self.array_index] != "*" and self.pascal_file[self.array_index + 1] != ")":
+            curr_comment += self.pascal_file[self.array_index]
+            psh.help_caseComment(self)
+
+        if self.array_index >= len(self.pascal_file):
+            return "Comment never completed"
+
+        curr_comment += self.pascal_file[self.array_index] + self.pascal_file[self.array_index + 1]
+        self.array_index += 2
+        self.token.set_colNumber(self.token.get_colNumber() + 2)
+        return self.token.build_token(curr_comment, token_types.defined_keywords_list.get("comment").upper())
+
+    def if_quote(self):
+        # Parameters
+        # Returns: A token of type string which was returned by the helper function
+
+        built_string = ""
+
+        built_string += self.pascal_file[self.array_index]
+        self.array_index += 1
+        self.token.set_colNumber(self.token.get_colNumber() + 1)
+
+        while self.array_index < len(self.pascal_file):
+            psh.help_caseQuote(self, built_string, self.pascal_file[self.array_index])
+
+        # throw an error if the file ends before the string is completed
+        if self.array_index >= len(self.pascal_file):
+            return "String never completed"
