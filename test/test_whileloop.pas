@@ -6,7 +6,7 @@ begin
    a = 1;
 
    (* Example of while loop *)
-   while  a != 5  do
+   while  a != 3  do
    begin
       print(a);
       a = a + 1;
