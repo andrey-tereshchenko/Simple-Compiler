@@ -45,11 +45,17 @@ input data in the form of a sequence of tokens or program instructions and usual
 of a parse tree or an abstract syntax tree.
 ## Syntax diagrams
 ### program
+![GitHub Logo](/images/program.png)
 ### block
+![GitHub Logo](/images/block.png)
 ### functions
+![GitHub Logo](/images/functions.png)
 ### declaration
+![GitHub Logo](/images/declaration.png)
 ### statements
+![GitHub Logo](/images/statements.png)
 ### statement
+![GitHub Logo](/images/statement.png)
 ## Stack Machine
 In computer science, computer engineering and programming language implementations, a stack machine is a type of computer. In some cases, the term refers to a software scheme that simulates a stack machine. The main difference from other computers is that most of its instructions operate on a pushdown stack of numbers rather than numbers in registers. Most computer systems implement a stack in some form to pass parameters and link to subroutines. This does not make these computers stack machines.
 
@@ -110,15 +116,107 @@ def decompress_bytes(compressed_version):
     return shift_one | shift_two | shift_three | shift_four
 ```
 
-# Simulator
-
 # Examples
-## if
+## if else
+##### Code
+```
+program testIf;
+
+var
+   a, b, max : integer;
+begin
+   a = 1;
+   b = 5;
+
+   if a > b then
+        max = a;
+   else
+        max = b;
+
+   print(max)
+
+end.
+```
+##### Result
+```
+5
+```
 
 ## for
+##### Code
+```
+program forLoop;
+var
+   n: integer;
+
+begin
+
+   (* For loop example *)
+   for n = 1  to 3 do
+   begin
+      print(n);
+   end;
+end.
+```
+##### Result
+```
+1
+2
+3
+```
 
 ## while
+##### Code
+```
+program whileLoop;
+
+var
+   a : integer;
+begin
+   a = 1;
+
+   (* Example of while loop *)
+   while  a != 3  do
+   begin
+      print(a);
+      a = a + 1;
+   end;
+
+end.
+```
+##### Result
+```
+1
+2
+```
 
 ## array 
+##### Code
+```
+program arrays;
 
-## procedure
+var
+    n: array [1..20] of integer;
+var
+    i, sum: integer;
+var
+    avg : real;
+
+begin
+    sum = 0;
+
+    for i = 1 to 10 do
+    begin
+        n[ i ] = i;
+
+        sum = sum + n[ i ];
+    end;
+
+    avg = sum / 20.0;
+    print(avg);
+end.
+```
+##### Result
+```
+2.75
+```
